@@ -5,6 +5,7 @@ type = "monster"
 level = 3
 atk = 800
 def = 1200
+attribute = "earth"
 flavor-text = '''
 Parente stretto del gorilla. Questo animale è solito avventurarsi in
 ambienti sociali disagiati.
