@@ -1,0 +1,43 @@
+-- Falcone il mago ciolone
+local s,id=GetID()
+function s.initial_effect(c)
+    -- Cannot be destroyed by battle
+    local e1=Effect.CreateEffect(c)
+    e1:SetType(EFFECT_TYPE_SINGLE)
+    e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+    e1:SetRange(LOCATION_MZONE)
+    e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+    e1:SetValue(1)
+    c:RegisterEffect(e1)
+    -- If equipped with c600000006: double ATK/DEF and can attack directly
+    local e2=Effect.CreateEffect(c)
+    e2:SetType(EFFECT_TYPE_SINGLE)
+    e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+    e2:SetRange(LOCATION_MZONE)
+    e2:SetCode(EFFECT_UPDATE_ATTACK)
+    e2:SetCondition(s.eqcon)
+    e2:SetValue(s.atkval)
+    c:RegisterEffect(e2)
+    local e3=e2:Clone()
+    e3:SetCode(EFFECT_UPDATE_DEFENSE)
+    e3:SetValue(s.defval)
+    c:RegisterEffect(e3)
+    local e4=Effect.CreateEffect(c)
+    e4:SetType(EFFECT_TYPE_SINGLE)
+    e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+    e4:SetRange(LOCATION_MZONE)
+    e4:SetCode(EFFECT_DIRECT_ATTACK)
+    e4:SetCondition(s.eqcon)
+    c:RegisterEffect(e4)
+end
+function s.eqcon(e)
+    local c=e:GetHandler()
+    local eq=c:GetEquipGroup()
+    return eq and eq:IsExists(function(ec) return ec:IsCode(600000006) end,1,nil)
+end
+function s.atkval(e,c)
+    return c:GetBaseAttack()
+end
+function s.defval(e,c)
+    return c:GetBaseDefense()
+end
