@@ -14,7 +14,7 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(3000)
+	Duel.SetTargetParam(1000)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
