@@ -19,10 +19,13 @@ function s.initial_effect(c)
     e1:SetOperation(s.operation)
     c:RegisterEffect(e1)
     
-    -- Guadagna LP alla fine del turno in base alle carte "12E0" nel Cimitero e tra quelle bandite
+    -- Guadagna LP alla fine di ogni tuo turno in base alle carte "12E0" nel Cimitero e tra quelle bandite
     local e2=Effect.CreateEffect(c)
     e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
     e2:SetCode(EVENT_PHASE+PHASE_END)
+    e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+        return Duel.GetTurnPlayer()==tp
+    end)
     e2:SetRange(LOCATION_FZONE)
     e2:SetCountLimit(1,id+100)
     e2:SetOperation(s.lpop)
@@ -112,6 +115,6 @@ function s.lpop(e,tp,eg,ep,ev,re,r,rp)
     local g2 = Duel.GetMatchingGroup(s.tsofilter,tp,LOCATION_REMOVED,0,nil)
     local ct = g1:GetCount() + g2:GetCount()
     if ct>0 then
-        Duel.Recover(tp, ct*300, REASON_EFFECT)
+        Duel.Recover(tp, ct*200, REASON_EFFECT)
     end
 end
