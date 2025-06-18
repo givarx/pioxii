@@ -14,6 +14,7 @@ function s.initial_effect(c)
     e1:SetType(EFFECT_TYPE_SINGLE)
     e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
     e1:SetValue(1) -- Impedisce la distruzione
+    e1:SetCountLimit(1)
     c:RegisterEffect(e1)
     
     -- Effetto 2: Sacrifica questa carta per evocare "Lorenzo Lv.6" da mano o Deck
