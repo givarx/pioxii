@@ -13,8 +13,9 @@ function s.initial_effect(c)
     local e1=Effect.CreateEffect(c)
     e1:SetType(EFFECT_TYPE_SINGLE)
     e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-    e1:SetValue(1) -- Impedisce la distruzione
+    
     e1:SetCountLimit(1)
+    e1:SetValue(s.valcon) -- Impedisce la distruzione
     c:RegisterEffect(e1)
     
     -- Effetto 2: Sacrifica questa carta per evocare "Lorenzo Lv.6" da mano o Deck
@@ -28,7 +29,9 @@ function s.initial_effect(c)
     e2:SetOperation(s.spop)
     c:RegisterEffect(e2)
 end
-
+function s.valcon(e,re,r,rp)
+	return (r&REASON_BATTLE)~=0 
+end
 -- Costo: Sacrifica questa carta
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then
