@@ -12,8 +12,9 @@ function s.initial_effect(c)
     -- Effetto 1: Protezione dalla distruzione in battaglia una volta per turno
     local e1=Effect.CreateEffect(c)
     e1:SetType(EFFECT_TYPE_SINGLE)
-    e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-    
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
     e1:SetCountLimit(1)
     e1:SetValue(s.valcon) -- Impedisce la distruzione
     c:RegisterEffect(e1)
