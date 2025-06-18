@@ -115,6 +115,6 @@ function s.lpop(e,tp,eg,ep,ev,re,r,rp)
     local g2 = Duel.GetMatchingGroup(s.tsofilter,tp,LOCATION_REMOVED,0,nil)
     local ct = g1:GetCount() + g2:GetCount()
     if ct>0 then
-        Duel.Recover(tp, ct*200, REASON_EFFECT)
+        Duel.Recover(tp, ct*150, REASON_EFFECT)
     end
 end
