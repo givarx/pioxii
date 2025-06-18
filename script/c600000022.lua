@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
     e1:SetCondition(s.battle_phase)
-	--e1:SetCondition(s.econ)
+	e1:SetCondition(s.econ)
 	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
 
@@ -27,7 +27,7 @@ function s.initial_effect(c)
     c:RegisterEffect(e2)
 end
 function s.econ(e)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and s.battle_phase(e)
+	return not (e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) )and Duel.GetCurrentPhase== PHASE_BATTLE
 end
 function s.efilter(e,te)
 	return te:GetOwner()~=e:GetOwner()
