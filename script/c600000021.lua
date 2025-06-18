@@ -30,7 +30,7 @@ function s.initial_effect(c)
     c:RegisterEffect(e2)
 end
 function s.valcon(e,re,r,rp)
-	return (r&REASON_BATTLE)~=0 
+	return r~=nil and (r&REASON_BATTLE)~=0
 end
 -- Costo: Sacrifica questa carta
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
