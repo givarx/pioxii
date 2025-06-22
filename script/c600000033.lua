@@ -49,13 +49,13 @@ end
 
 function s.extra_filter(c,e,tp)
     return (c:IsType(TYPE_SYNCHRO) or c:IsType(TYPE_XYZ) or c:IsType(TYPE_FUSION))
-        and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK)
+        and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,true,false)
 end
 
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
     local op=e:GetLabel()
     if op==0 then
-        -- Opzione 1: Paga 2000 LP, tributa un TSO obbligatorio, Special Summon 1 Synchro/Xyz/Fusione dall'Extra Deck
+        -- Opzione 1: Paga 2000 LP, tributa un TSO, Evoca qualsiasi Synchro/Xyz/Fusione ignorando le condizioni
         if not Duel.CheckLPCost(tp,2000) then return end
         Duel.PayLPCost(tp,2000)
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
@@ -66,15 +66,15 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         local sg=Duel.SelectMatchingCard(tp,s.extra_filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
         if #sg>0 then
             local sc=sg:GetFirst()
-            if Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP_ATTACK)>0 then
-                -- Non può attaccare per il resto del turno
-                local e1=Effect.CreateEffect(e:GetHandler())
-                e1:SetType(EFFECT_TYPE_SINGLE)
-                e1:SetCode(EFFECT_CANNOT_ATTACK)
-                e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-                e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-                sc:RegisterEffect(e1)
-            end
+            -- Evoca ignorando le condizioni di evocazione
+            Duel.SpecialSummonRule(tp,sc)
+            -- Non può attaccare per il resto del turno
+            local e1=Effect.CreateEffect(e:GetHandler())
+            e1:SetType(EFFECT_TYPE_SINGLE)
+            e1:SetCode(EFFECT_CANNOT_ATTACK)
+            e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+            e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+            sc:RegisterEffect(e1)
         end
     else
         -- Opzione 2: Paga 1000 LP, +500 ATK e protezione targeting a un mostro non Normale
