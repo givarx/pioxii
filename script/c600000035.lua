@@ -54,7 +54,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
     return Duel.IsExistingMatchingCard(s.ciolonefilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.ciolonefilter(c)
-    return c:IsCode(600000034) -- Sostituisci con l'ID di "Falcone il Mago Ciolone"
+    return c:IsCode(600000007) -- Sostituisci con l'ID di "Falcone il Mago Ciolone"
 end
 -- Effetto 2: Target (evoca questa carta)
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
