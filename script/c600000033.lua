@@ -48,14 +48,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function s.extra_filter(c,e,tp)
-    return (c:IsType(TYPE_SYNCHRO) or c:IsType(TYPE_XYZ) or c:IsType(TYPE_FUSION))
-        and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,true,false)
+    return c:IsType(TYPE_SYNCHRO) or c:IsType(TYPE_XYZ) or c:IsType(TYPE_FUSION)
 end
 
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
     local op=e:GetLabel()
     if op==0 then
-        -- Opzione 1: Paga 2000 LP, tributa un TSO, Evoca qualsiasi Synchro/Xyz/Fusione ignorando le condizioni
         if not Duel.CheckLPCost(tp,2000) then return end
         Duel.PayLPCost(tp,2000)
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
@@ -67,7 +65,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         if #sg>0 then
             local sc=sg:GetFirst()
             -- Evoca ignorando le condizioni di evocazione
-            Duel.SpecialSummonRule(tp,sc)
+            Duel.SpecialSummon(sc,SUMMON_TYPE_SPECIAL,tp,tp,true,true,POS_FACEUP)
             -- Non può attaccare per il resto del turno
             local e1=Effect.CreateEffect(e:GetHandler())
             e1:SetType(EFFECT_TYPE_SINGLE)
