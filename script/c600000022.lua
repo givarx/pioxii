@@ -11,14 +11,13 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-    e1:SetCondition(s.battle_phase)
 	e1:SetCondition(s.econ)
 	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
 
     -- Trigger when this card is Normal Summoned
     local e2=Effect.CreateEffect(c)
-    e2:SetCategory(CATEGORY_TOGRAVE+SEQ_DECKSHUFFLE)
+    e2:SetCategory(CATEGORY_TOGRAVE)
     e2:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
     e2:SetCode(EVENT_SUMMON_SUCCESS)
     e2:SetProperty(EFFECT_FLAG_DELAY)
@@ -26,20 +25,15 @@ function s.initial_effect(c)
     e2:SetOperation(s.tgop)
     c:RegisterEffect(e2)
 end
-function s.econ(e)
-	return  (e:GetHandler():IsStatus(POS_FACEUP) )and Duel.GetCurrentPhase== PHASE_BATTLE
-end
-function s.efilter(e,te)
-	return te:GetOwner()~=e:GetOwner()
-end
+
 -- Condition: only during Battle Phase
-function s.battle_phase(e)
-    return Duel.GetCurrentPhase()==PHASE_BATTLE
+function s.econ(e)
+	return e:GetHandler():IsFaceup() and Duel.GetCurrentPhase()==PHASE_BATTLE
 end
 
--- Effect filter: ignore effects from cards controlled by this card’s owner
-function s.immune_filter(e,te)
-    return Duel.GetCurrentPhase()==PHASE_BATTLE
+-- Effect filter: immune to effects from opponent
+function s.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end
 
 -- Filter for cards with "lorenzo" in their name that can be sent to the Graveyard
@@ -47,14 +41,12 @@ function s.tgfilter(c)
     return c:IsCode(600000001,600000021,600000022) and c:IsAbleToGrave()
 end
 
--- Target selection: ensure there is at least one valid card from hand or deck and some banished cards
+-- Target selection: ensure there is at least one valid card from hand or deck
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then 
         return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil)
-            and Duel.GetFieldGroupCount(tp,LOCATION_REMOVED,0)>0 
     end
     Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
-    Duel.SetOperationInfo(0,SEQ_DECKSHUFFLE,nil,0,tp,LOCATION_REMOVED)
 end
 
 -- Operation: send one "lorenzo" card to the Graveyard and shuffle all banished cards into the Deck
