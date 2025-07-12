@@ -35,6 +35,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
+	-- Alla fine, rimischia sempre questa carta nel deck
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
