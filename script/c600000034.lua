@@ -84,20 +84,7 @@ end
 
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE)~=0 then
-		-- Al termine del turno, bandisci questa carta
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetCountLimit(1)
-		e1:SetLabelObject(c)
-		e1:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
-			local tc=e:GetLabelObject()
-			if tc and tc:IsLocation(LOCATION_MZONE) then
-				Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
-			end
-		end)
-		Duel.RegisterEffect(e1,tp)
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 	end
 end
