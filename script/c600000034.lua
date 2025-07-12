@@ -28,8 +28,9 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_PHASE+PHASE_MAIN1)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCode(EVENT_PHASE+PHASE_MAIN1)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
@@ -45,13 +46,28 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_REMOVE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e3:SetCode(EVENT_SPSUMMON)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(s.negcon)
-	e3:SetCost(s.negcost)
-	e3:SetTarget(s.negtg)
-	e3:SetOperation(s.negop)
+	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+		-- Check if opponent summons from the Extra Deck
+		return ep==1-tp and eg:IsExists(Card.IsLocation,1,nil,LOCATION_EXTRA)
+	end)
+	e3:SetCost(function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+		Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+	end)
+	e3:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if chk==0 then return true end
+		Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
+	end)
+	e3:SetOperation(function(e,tp,eg,ep,ev,re,r,rp)
+		if Duel.NegateSpecialSummon(eg) then
+			Duel.Remove(eg,POS_FACEUP,REASON_EFFECT)
+		end
+	end)
 	c:RegisterEffect(e3)
 end
 
@@ -104,30 +120,5 @@ function s.banop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetLabelObject()
 	if c:IsLocation(LOCATION_MZONE) then
 		Duel.Remove(c,POS_FACEUP,REASON_EFFECT)
-	end
-end
-
---Condizione: l'avversario sta per effettuare un'evocazione dall'Extra Deck
-function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==1-tp and eg:IsExists(Card.IsLocation,1,nil,LOCATION_EXTRA)
-end
-
---Costo: manda questa carta al cimitero
-function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-end
-
---Target per annullare l'evocazione e bandire
-function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
-end
-
---Annulla l'evocazione e bandisci quella carta
-function s.negop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateSpecialSummon(eg) then
-		Duel.Remove(eg,POS_FACEUP,REASON_EFFECT)
 	end
 end
