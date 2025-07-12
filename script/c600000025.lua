@@ -70,5 +70,5 @@ function s.initial_effect(c)
 end
 function s.filter(c)
         -- Define your card filter conditions here.
-        return c:IsAbleToRemove() and (c:IsCode(600000001,600000021,600000009,600000022,600000007,600000013,600000000,0x4444))
+        return c:IsAbleToRemove() and (c:IsCode(600000001,600000021,600000009,600000022,600000007,600000013,600000000,0x600000034))
     end
