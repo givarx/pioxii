@@ -14,7 +14,7 @@ function s.initial_effect(c)
 end
 
 function s.filter(c)
-    return (c:IsCode(600000000) or c:IsCode(600000012) or c:IsCode(600000013)) and c:IsAbleToHand()
+    return (c:IsCode(600000000) or c:IsCode(600000012) or c:IsCode(600000013)or c:IsCode(0x4444)) and c:IsAbleToHand()
     -- Sostituisci i codici sopra con quelli reali delle tue carte
 end
 

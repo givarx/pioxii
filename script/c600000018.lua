@@ -27,7 +27,7 @@ function s.initial_effect(c)
         return Duel.GetTurnPlayer()==tp
     end)
     e2:SetRange(LOCATION_FZONE)
-    e2:SetCountLimit(1,id+100)
+    e2:SetCountLimit(1,id+1000)
     e2:SetOperation(s.lpop)
     c:RegisterEffect(e2)
 end
