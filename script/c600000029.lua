@@ -34,10 +34,13 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
+	-- Rimischia questa carta nel Deck
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	end
 end
 function s.cost_func(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToDeckAsCost() end
-	Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_COST)
-
+	if chk==0 then return true end
+	-- Nessun costo aggiuntivo, la carta verrà rimischiata dopo la risoluzione
 end
