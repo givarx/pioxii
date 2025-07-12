@@ -43,8 +43,8 @@ function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return eg and eg:IsExists(s.disfilter,1,nil,1-tp)
 end
 
-function s.disfilter(c,tp)
-	return c:IsControler(1-tp) and c:IsPreviousLocation(LOCATION_EXTRA)
+function s.disfilter(c,opp_tp)
+	return c:IsControler(opp_tp) and c:IsPreviousLocation(LOCATION_EXTRA)
 end
 
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
