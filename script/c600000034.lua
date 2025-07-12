@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_SPSUMMON)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.discon)
@@ -53,15 +53,14 @@ function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,#eg,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,#eg,0,0)
+	local g=eg:Filter(s.disfilter,nil,1-tp)
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
 end
 
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(s.disfilter,nil,1-tp)
 	if #g>0 then
-		Duel.NegateSummon(g)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
