@@ -30,6 +30,16 @@ function s.initial_effect(c)
     e2:SetCountLimit(1,id+1000)
     e2:SetOperation(s.lpop)
     c:RegisterEffect(e2)
+    
+    -- I mostri dell'archetipo Michele (0x5555) guadagnano 400 ATK
+    local e3=Effect.CreateEffect(c)
+    e3:SetType(EFFECT_TYPE_FIELD)
+    e3:SetCode(EFFECT_UPDATE_ATTACK)
+    e3:SetRange(LOCATION_FZONE)
+    e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+    e3:SetTarget(s.atktg)
+    e3:SetValue(400)
+    c:RegisterEffect(e3)
 end
 
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -117,4 +127,8 @@ function s.lpop(e,tp,eg,ep,ev,re,r,rp)
     if ct>0 then
         Duel.Recover(tp, ct*150, REASON_EFFECT)
     end
+end
+
+function s.atktg(e,c)
+    return c:IsSetCard(0x5555)
 end
