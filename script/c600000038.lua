@@ -37,9 +37,9 @@ function s.initial_effect(c)
 end
 s.listed_names={600000018,600000033}
 
---special summon condition: 600000018 must be active in field zone
+--special summon condition: 600000018 must be active in field zone (either player)
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,600000018),tp,LOCATION_FZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,600000018),tp,LOCATION_FZONE,LOCATION_FZONE,1,nil)
 end
 
 --special summon target
