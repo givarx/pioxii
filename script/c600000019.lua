@@ -30,14 +30,7 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(s.damop)
 	c:RegisterEffect(e3)
-	--manual add counter (for testing)
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetType(EFFECT_TYPE_IGNITION)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
-	e4:SetOperation(s.manualct)
-	c:RegisterEffect(e4)
+	
 end
 
 --add counter condition
@@ -49,7 +42,7 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
 		c:AddCounter(0xaaaa,1)
-		Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0xaaaa))
+		--Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0xaaaa))
 	end
 end
 --move counter condition
