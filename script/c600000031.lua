@@ -17,7 +17,7 @@ function s.initial_effect(c)
     e1:SetOperation(s.activate)
     c:RegisterEffect(e1)
 end
-s.listed_names={600000014} -- Colelli
+s.listed_names={600000014,600000018} -- Colelli
 
 function s.davidefilter(c)
     return c:IsFaceup() and c:IsCode(600000000,600000013,600000034,600000012) -- Archetipo "Davide"
