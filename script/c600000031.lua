@@ -20,7 +20,7 @@ end
 s.listed_names={600000014} -- Colelli
 
 function s.davidefilter(c)
-    return c:IsFaceup() and c:IsSetCard(0x5555) -- Archetipo "Davide"
+    return c:IsFaceup() and c:IsSetCard(0x4444) -- Archetipo "Davide"
 end
 
 -- Costo: Scarta un mostro di tipo Macchina dalla mano
