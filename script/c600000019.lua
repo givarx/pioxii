@@ -1,6 +1,8 @@
 --Chemio Counter Monster
 local s,id=GetID()
 function s.initial_effect(c)
+	--enable counter
+	c:EnableCounterPermit(0xaaaa)
 	--add counter during standby phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
@@ -45,9 +47,9 @@ end
 --add counter operation
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsFaceup() then
 		c:AddCounter(0xaaaa,1)
-		Debug.Message("Counter aggiunto! Totale: " .. c:GetCounter(0xaaaa))
+		Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0xaaaa))
 	end
 end
 --move counter condition
@@ -89,7 +91,7 @@ end
 --manual counter operation
 function s.manualct(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsFaceup() then
 		c:AddCounter(0xaaaa,1)
 		Debug.Message("Counter manualmente aggiunto! Totale: " .. c:GetCounter(0xaaaa))
 	end
