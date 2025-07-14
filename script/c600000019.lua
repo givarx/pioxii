@@ -53,18 +53,18 @@ function s.mvcon(e,tp,eg,ep,ev,re,r,rp)
 end
 --counter filter
 function s.ctfilter(c)
-	return c:IsFaceup()
+	return c:IsFaceup() and c~=nil
 end
 --move counter target
 function s.mvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.ctfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.ctfilter(chkc) end
 	if chk==0 then 
-		local exists = Duel.IsExistingTarget(s.ctfilter,tp,0,LOCATION_MZONE,1,nil)
+		local exists = Duel.IsExistingTarget(s.ctfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 		Debug.Message("Controllo target: esistono bersagli validi = " .. tostring(exists))
 		return exists
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.ctfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,s.ctfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
 end
 --move counter operation
 function s.mvop(e,tp,eg,ep,ev,re,r,rp)
@@ -72,13 +72,18 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		c:RemoveCounter(tp,0xaaaa,1,REASON_EFFECT)
-		--check if target has counters, if not enable counter support
-		if tc:GetCounter(0xaaaa)==0 then
+		local current_counters = tc:GetCounter(0xaaaa)
+		Debug.Message("Counter attuali su bersaglio: " .. current_counters)
+		
+		--if target has no counters, enable counter support first
+		if current_counters == 0 then
 			tc:EnableCounterPermit(0xaaaa)
 			Debug.Message("Abilitati counter sulla carta bersaglio: " .. tc:GetCode())
 		end
+		
+		--add counter (works for both cases)
 		tc:AddCounter(0xaaaa,1)
-		Debug.Message("Counter trasferito a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0xaaaa))
+		Debug.Message("Counter aggiunto a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0xaaaa))
 	end
 end
 --damage operation
