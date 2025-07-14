@@ -30,14 +30,6 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(s.damop)
 	c:RegisterEffect(e3)
-	--manual add counter (for testing)
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetType(EFFECT_TYPE_IGNITION)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
-	e4:SetOperation(s.manualct)
-	c:RegisterEffect(e4)
 end
 
 --add counter condition
