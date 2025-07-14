@@ -20,6 +20,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
+	e2:SetCondition(s.mvcon)
 	e2:SetTarget(s.mvtg)
 	e2:SetOperation(s.mvop)
 	c:RegisterEffect(e2)
@@ -74,10 +75,15 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	Debug.Message("Operazione chiamata!")
 	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Debug.Message("Condizioni soddisfatte, procedo...")
-		-- Remove counter only if we have one
-		if c:GetCounter(0xaaaa) > 0 then
-			c:RemoveCounter(tp,0xaaaa,1,REASON_EFFECT)
-			Debug.Message("Counter rimosso dalla carta origine")
+		-- Check if we have counter 0x4321 and remove it
+		local our_counters = c:GetCounter(0x4321)
+		Debug.Message("Counter 0x4321 sulla carta origine: " .. our_counters)
+		if our_counters > 0 then
+			c:RemoveCounter(tp,0x4321,1,REASON_EFFECT)
+			Debug.Message("Counter 0x4321 rimosso dalla carta origine")
+		else
+			Debug.Message("ERRORE: Nessun counter 0x4321 da rimuovere!")
+			return
 		end
 		
 		local current_counters = tc:GetCounter(0x4321)
@@ -100,7 +106,7 @@ end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		local ct=tc:GetCounter(0xaaaa)
+		local ct=tc:GetCounter(0x4321)
 		if ct>0 then
 			local p=tc:GetPreviousControler()
 			Duel.Damage(p,ct*500,REASON_EFFECT)
@@ -113,6 +119,6 @@ function s.manualct(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
 		c:AddCounter(0x4321,1)
-		Debug.Message("Counter manualmente aggiunto! Totale: " .. c:GetCounter(0xaaaa))
+		Debug.Message("Counter manualmente aggiunto! Totale: " .. c:GetCounter(0x4321))
 	end
 end
