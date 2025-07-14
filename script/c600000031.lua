@@ -36,7 +36,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
     Duel.SendtoGrave(g,REASON_COST)
 end
 function s.machinefilter(c)
-    return c:IsType(TYPE_MACHINE) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
+    return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_MACHINE) and c:IsAbleToGraveAsCost()
 end
 
 -- Target: Controlla se puoi evocare un "Colelli"
