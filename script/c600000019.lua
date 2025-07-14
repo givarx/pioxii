@@ -42,12 +42,14 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
 		c:AddCounter(0xaaaa,1)
-		--Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0xaaaa))
+		Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0xaaaa))
 	end
 end
 --move counter condition
 function s.mvcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetCounter(0xaaaa)>0
+	local ct = e:GetHandler():GetCounter(0xaaaa)
+	Debug.Message("Controllo condizione move: counter presenti = " .. ct)
+	return ct>0
 end
 --counter filter
 function s.ctfilter(c)
@@ -56,7 +58,11 @@ end
 --move counter target
 function s.mvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.ctfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.ctfilter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then 
+		local exists = Duel.IsExistingTarget(s.ctfilter,tp,0,LOCATION_MZONE,1,nil)
+		Debug.Message("Controllo target: esistono bersagli validi = " .. tostring(exists))
+		return exists
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.ctfilter,tp,0,LOCATION_MZONE,1,1,nil)
 end
