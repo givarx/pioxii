@@ -2,8 +2,8 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--enable counter
-	c:EnableCounterPermit(0xaaaa)
-	c:SetCounterLimit(0xaaaa, 150)
+	c:EnableCounterPermit(0x4321)
+	c:SetCounterLimit(0x4321, 150)
 	--add counter during standby phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
@@ -13,14 +13,13 @@ function s.initial_effect(c)
 	e1:SetCondition(s.ctcon)
 	e1:SetOperation(s.ctop)
 	c:RegisterEffect(e1)
-	--move counter to opponent monster
+	--move counter to any monster
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_COUNTER)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
-	e2:SetCondition(s.mvcon)
 	e2:SetTarget(s.mvtg)
 	e2:SetOperation(s.mvop)
 	c:RegisterEffect(e2)
@@ -59,10 +58,12 @@ end
 function s.mvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.ctfilter(chkc) end
 	if chk==0 then 
+		Debug.Message("Controllo target chiamato")
 		local exists = Duel.IsExistingTarget(s.ctfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 		Debug.Message("Controllo target: esistono bersagli validi = " .. tostring(exists))
 		return exists
 	end
+	Debug.Message("Seleziono target...")
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.ctfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
 end
@@ -70,20 +71,29 @@ end
 function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
+	Debug.Message("Operazione chiamata!")
 	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		c:RemoveCounter(tp,0xaaaa,1,REASON_EFFECT)
-		local current_counters = tc:GetCounter(0xaaaa)
+		Debug.Message("Condizioni soddisfatte, procedo...")
+		-- Remove counter only if we have one
+		if c:GetCounter(0xaaaa) > 0 then
+			c:RemoveCounter(tp,0xaaaa,1,REASON_EFFECT)
+			Debug.Message("Counter rimosso dalla carta origine")
+		end
+		
+		local current_counters = tc:GetCounter(0x4321)
 		Debug.Message("Counter attuali su bersaglio: " .. current_counters)
 		
 		--if target has no counters, enable counter support first
 		if current_counters == 0 then
-			tc:EnableCounterPermit(0xaaaa)
+			tc:EnableCounterPermit(0x4321)
 			Debug.Message("Abilitati counter sulla carta bersaglio: " .. tc:GetCode())
 		end
 		
 		--add counter (works for both cases)
-		tc:AddCounter(0xaaaa,1)
-		Debug.Message("Counter aggiunto a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0xaaaa))
+		tc:AddCounter(0x4321,1)
+		Debug.Message("Counter aggiunto a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0x4321))
+	else
+		Debug.Message("Condizioni non soddisfatte!")
 	end
 end
 --damage operation
@@ -102,7 +112,7 @@ end
 function s.manualct(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
-		c:AddCounter(0xaaaa,1)
+		c:AddCounter(0x4321,1)
 		Debug.Message("Counter manualmente aggiunto! Totale: " .. c:GetCounter(0xaaaa))
 	end
 end
