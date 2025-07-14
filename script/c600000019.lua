@@ -40,13 +40,13 @@ end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
-		c:AddCounter(0xaaaa,1)
-		Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0xaaaa))
+		c:AddCounter(0x4321,1)
+		Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0x4321))
 	end
 end
 --move counter condition
 function s.mvcon(e,tp,eg,ep,ev,re,r,rp)
-	local ct = e:GetHandler():GetCounter(0xaaaa)
+	local ct = e:GetHandler():GetCounter(0x4321)
 	Debug.Message("Controllo condizione move: counter presenti = " .. ct)
 	return ct>0
 end
