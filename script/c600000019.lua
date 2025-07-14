@@ -43,13 +43,13 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
 		c:AddCounter(0x4321,1)
-		Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0x4321))
+		--Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0x4321))
 	end
 end
 --move counter condition
 function s.mvcon(e,tp,eg,ep,ev,re,r,rp)
 	local ct = e:GetHandler():GetCounter(0x4321)
-	Debug.Message("Controllo condizione move: counter presenti = " .. ct)
+	--Debug.Message("Controllo condizione move: counter presenti = " .. ct)
 	return ct>0
 end
 --counter filter
@@ -60,12 +60,12 @@ end
 function s.mvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.ctfilter(chkc) end
 	if chk==0 then 
-		Debug.Message("Controllo target chiamato")
+		--Debug.Message("Controllo target chiamato")
 		local exists = Duel.IsExistingTarget(s.ctfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
-		Debug.Message("Controllo target: esistono bersagli validi = " .. tostring(exists))
+		--Debug.Message("Controllo target: esistono bersagli validi = " .. tostring(exists))
 		return exists
 	end
-	Debug.Message("Seleziono target...")
+	--Debug.Message("Seleziono target...")
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.ctfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
 end
@@ -73,52 +73,52 @@ end
 function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	Debug.Message("Operazione chiamata!")
+	--Debug.Message("Operazione chiamata!")
 	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		Debug.Message("Condizioni soddisfatte, procedo...")
+		--Debug.Message("Condizioni soddisfatte, procedo...")
 		-- Check if we have counter 0x4321 and remove it
 		local our_counters = c:GetCounter(0x4321)
-		Debug.Message("Counter 0x4321 sulla carta origine: " .. our_counters)
+		--Debug.Message("Counter 0x4321 sulla carta origine: " .. our_counters)
 		if our_counters > 0 then
 			c:RemoveCounter(tp,0x4321,1,REASON_EFFECT)
-			Debug.Message("Counter 0x4321 rimosso dalla carta origine")
+			--Debug.Message("Counter 0x4321 rimosso dalla carta origine")
 		else
-			Debug.Message("ERRORE: Nessun counter 0x4321 da rimuovere!")
+			--Debug.Message("ERRORE: Nessun counter 0x4321 da rimuovere!")
 			return
 		end
 		
 		local current_counters = tc:GetCounter(0x4321)
-		Debug.Message("Counter attuali su bersaglio: " .. current_counters)
+		--Debug.Message("Counter attuali su bersaglio: " .. current_counters)
 		
 		--enable counter support if needed
 		if current_counters == 0 then
 			tc:EnableCounterPermit(0x4321)
-			Debug.Message("Abilitati counter sulla carta bersaglio: " .. tc:GetCode())
+			--Debug.Message("Abilitati counter sulla carta bersaglio: " .. tc:GetCode())
 		end
 		
 		--add counter (works for both cases)
 		tc:AddCounter(0x4321,1)
-		Debug.Message("Counter aggiunto a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0x4321))
+		--Debug.Message("Counter aggiunto a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0x4321))
 	else
-		Debug.Message("Condizioni non soddisfatte!")
+		--Debug.Message("Condizioni non soddisfatte!")
 	end
 end
 --damage operation when monster is destroyed
 function s.destroyop(e,tp,eg,ep,ev,re,r,rp)
-	Debug.Message("Effetto danno attivato! Controllando carte che vanno al cimitero...")
+	--Debug.Message("Effetto danno attivato! Controllando carte che vanno al cimitero...")
 	local tc=eg:GetFirst()
 	while tc do
-		Debug.Message("Carta controllata: " .. tc:GetCode() .. " - Tipo: " .. (tc:IsType(TYPE_MONSTER) and "Mostro" or "Non-mostro"))
+		--Debug.Message("Carta controllata: " .. tc:GetCode() .. " - Tipo: " .. (tc:IsType(TYPE_MONSTER) and "Mostro" or "Non-mostro"))
 		if tc:IsType(TYPE_MONSTER) and tc:IsReason(REASON_DESTROY) then
 			local ct=tc:GetCounter(0x4321)
-			Debug.Message("Mostro distrutto con " .. ct .. " counter")
+			--Debug.Message("Mostro distrutto con " .. ct .. " counter")
 			if ct>0 then
 				local p=tc:GetOwner()
 				local damage_amount = ct * 500
-				Debug.Message("Mostro " .. tc:GetCode() .. " con " .. ct .. " counter distrutto. Danno: " .. damage_amount .. " al proprietario " .. p)
+				--Debug.Message("Mostro " .. tc:GetCode() .. " con " .. ct .. " counter distrutto. Danno: " .. damage_amount .. " al proprietario " .. p)
 				Duel.Damage(p,damage_amount,REASON_EFFECT)
 			else
-				Debug.Message("Mostro " .. tc:GetCode() .. " distrutto ma senza counter")
+				--Debug.Message("Mostro " .. tc:GetCode() .. " distrutto ma senza counter")
 			end
 		end
 		tc=eg:GetNext()
@@ -129,6 +129,6 @@ function s.manualct(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
 		c:AddCounter(0x4321,1)
-		Debug.Message("Counter manualmente aggiunto! Totale: " .. c:GetCounter(0x4321))
+		--Debug.Message("Counter manualmente aggiunto! Totale: " .. c:GetCounter(0x4321))
 	end
 end
