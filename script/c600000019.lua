@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	--damage when monster is destroyed with counters
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_DESTROYED)
+	e3:SetCode(EVENT_DESTROY)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(s.destroyop)
 	c:RegisterEffect(e3)
@@ -105,15 +105,20 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 end
 --damage operation when monster is destroyed
 function s.destroyop(e,tp,eg,ep,ev,re,r,rp)
+	Debug.Message("Effetto danno attivato! Controllando carte che vanno al cimitero...")
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsType(TYPE_MONSTER) then
+		Debug.Message("Carta controllata: " .. tc:GetCode() .. " - Tipo: " .. (tc:IsType(TYPE_MONSTER) and "Mostro" or "Non-mostro"))
+		if tc:IsType(TYPE_MONSTER) and tc:IsReason(REASON_DESTROY) then
 			local ct=tc:GetCounter(0x4321)
+			Debug.Message("Mostro distrutto con " .. ct .. " counter")
 			if ct>0 then
 				local p=tc:GetOwner()
 				local damage_amount = ct * 500
 				Debug.Message("Mostro " .. tc:GetCode() .. " con " .. ct .. " counter distrutto. Danno: " .. damage_amount .. " al proprietario " .. p)
 				Duel.Damage(p,damage_amount,REASON_EFFECT)
+			else
+				Debug.Message("Mostro " .. tc:GetCode() .. " distrutto ma senza counter")
 			end
 		end
 		tc=eg:GetNext()
