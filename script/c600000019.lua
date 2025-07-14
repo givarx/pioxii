@@ -87,17 +87,16 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 		if current_counters == 0 then
 			tc:EnableCounterPermit(0x4321)
 			Debug.Message("Abilitati counter sulla carta bersaglio: " .. tc:GetCode())
+			
+			--add damage effect only when card gets its first counter
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+			e1:SetCode(EVENT_LEAVE_FIELD)
+			e1:SetOperation(s.damageop2)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			tc:RegisterEffect(e1)
+			Debug.Message("Effetto di danno applicato alla carta bersaglio: " .. tc:GetCode())
 		end
-		
-		--always add damage effect to ensure it works
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_LEAVE_FIELD)
-		e1:SetCondition(s.damagecon)
-		e1:SetOperation(s.damageop2)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		Debug.Message("Effetto di danno applicato alla carta bersaglio: " .. tc:GetCode())
 		
 		--add counter (works for both cases)
 		tc:AddCounter(0x4321,1)
@@ -106,21 +105,18 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 		Debug.Message("Condizioni non soddisfatte!")
 	end
 end
---damage condition for individual cards
-function s.damagecon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetCounter(0x4321)>0
-end
-
 --damage operation for individual cards
 function s.damageop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=c:GetCounter(0x4321)
+	Debug.Message("Effetto danno attivato per carta " .. c:GetCode() .. " con " .. ct .. " counter")
 	if ct>0 then
 		local p=c:GetOwner()
 		local damage_amount = ct * 500
 		Debug.Message("Carta individuale " .. c:GetCode() .. " con " .. ct .. " counter lascia il campo. Danno: " .. damage_amount .. " al proprietario " .. p)
 		Duel.Damage(p,damage_amount,REASON_EFFECT)
+	else
+		Debug.Message("Nessun counter presente, nessun danno")
 	end
 end
 --manual counter operation
