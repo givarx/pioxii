@@ -17,7 +17,7 @@ function s.initial_effect(c)
     e1:SetOperation(s.activate)
     c:RegisterEffect(e1)
 end
-s.listed_names={600000014,600000018} -- Colelli
+s.listed_names={600000014,600000019} -- Colelli
 
 function s.davidefilter(c)
     return c:IsFaceup() and c:IsCode(600000000,600000013,600000034,600000012) -- Archetipo "Davide"
@@ -26,7 +26,7 @@ function s.machinefilter(c)
     return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_MACHINE) and c:IsDiscardable()
 end
 function s.colellifilter(c,e,tp)
-    return c:IsCode(600000014,600000018) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) -- "Colelli"
+    return c:IsCode(600000014,600000019) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) -- "Colelli"
 end
 
 -- Costo: Scarta un mostro di tipo Macchina dalla mano
