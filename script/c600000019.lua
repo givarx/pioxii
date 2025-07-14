@@ -3,6 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--enable counter
 	c:EnableCounterPermit(0xaaaa)
+	c:SetCounterLimit(0xaaaa, 150)
 	--add counter during standby phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
@@ -65,8 +66,11 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		c:RemoveCounter(tp,0xaaaa,1,REASON_EFFECT)
-		--enable counter on target card and add counter
-		tc:EnableCounterPermit(0xaaaa)
+		--check if target has counters, if not enable counter support
+		if tc:GetCounter(0xaaaa)==0 then
+			tc:EnableCounterPermit(0xaaaa)
+			Debug.Message("Abilitati counter sulla carta bersaglio: " .. tc:GetCode())
+		end
 		tc:AddCounter(0xaaaa,1)
 		Debug.Message("Counter trasferito a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0xaaaa))
 	end
