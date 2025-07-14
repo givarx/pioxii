@@ -1,10 +1,10 @@
 --Chemio Counter Monster
 local s,id=GetID()
 function s.initial_effect(c)
-	--add counter during main phase
+	--add counter during standby phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_PHASE+PHASE_MAIN1)
+	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCondition(s.ctcon)
@@ -28,6 +28,14 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(s.damop)
 	c:RegisterEffect(e3)
+	--manual add counter (for testing)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1)
+	e4:SetOperation(s.manualct)
+	c:RegisterEffect(e4)
 end
 
 --add counter condition
@@ -37,8 +45,9 @@ end
 --add counter operation
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		c:AddCounter(0xaaaa,1)
+		Debug.Message("Counter aggiunto! Totale: " .. c:GetCounter(0xaaaa))
 	end
 end
 --move counter condition
@@ -75,5 +84,13 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Damage(p,ct*500,REASON_EFFECT)
 		end
 		tc=eg:GetNext()
+	end
+end
+--manual counter operation
+function s.manualct(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and c:IsFaceup() then
+		c:AddCounter(0xaaaa,1)
+		Debug.Message("Counter manualmente aggiunto! Totale: " .. c:GetCounter(0xaaaa))
 	end
 end
