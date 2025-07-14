@@ -30,7 +30,14 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(s.damop)
 	c:RegisterEffect(e3)
-	
+	--manual add counter (for testing)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1)
+	e4:SetOperation(s.manualct)
+	c:RegisterEffect(e4)
 end
 
 --add counter condition
@@ -51,7 +58,7 @@ function s.mvcon(e,tp,eg,ep,ev,re,r,rp)
 end
 --counter filter
 function s.ctfilter(c)
-	return c:IsFaceup() and c:IsCanAddCounter(0xaaaa,1)
+	return c:IsFaceup()
 end
 --move counter target
 function s.mvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -66,7 +73,10 @@ function s.mvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		c:RemoveCounter(tp,0xaaaa,1,REASON_EFFECT)
+		--enable counter on target card and add counter
+		tc:EnableCounterPermit(0xaaaa)
 		tc:AddCounter(0xaaaa,1)
+		Debug.Message("Counter trasferito a " .. tc:GetCode() .. "! Totale su bersaglio: " .. tc:GetCounter(0xaaaa))
 	end
 end
 --damage operation
