@@ -54,7 +54,6 @@ function c600000019.move_target(e, tp, eg, ep, ev, re, rp, chk, chkc)
     end
     Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_FACEUP)
     Duel.SelectTarget(tp, c600000019.counter_filter, tp, 0, LOCATION_MZONE, 1, 1, nil)
-    Duel.SetOperationInfo(0, CATEGORY_COUNTER, nil, 1, 0, 0xaaaa)
 end
 
 -- Effetto 2: Sposta il segnalino chemio dal proprietario a quello selezionato
