@@ -20,7 +20,7 @@ end
 s.listed_names={600000014} -- Colelli
 
 function s.davidefilter(c)
-    return c:IsFaceup() and c:IsSetCard(0x4444) -- Archetipo "Davide"
+    return c:IsFaceup() and c:IsCode(600000000,600000013,600000034,600000012) -- Archetipo "Davide"
 end
 function s.machinefilter(c)
     return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_MACHINE) and c:IsDiscardable()
