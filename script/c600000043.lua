@@ -44,12 +44,17 @@ function s.initial_effect(c)
 	e4:SetOperation(s.negop)
 	c:RegisterEffect(e4,false,REGISTER_FLAG_DETACH_XMAT)
 	
-	--attach opponent's monster as xyz material
+	--attach opponent's monster as xyz material (Quick Effect)
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e5:SetCode(EVENT_DAMAGE_STEP_END)
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e5:SetHintTiming(TIMING_BATTLE_PHASE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1,id+1)
 	e5:SetCondition(s.attachcon)
+	e5:SetTarget(s.attachtg)
 	e5:SetOperation(s.attachop)
 	c:RegisterEffect(e5)
 end
@@ -97,16 +102,25 @@ end
 function s.attachcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and bc and bc:IsControler(1-tp) and c:GetOverlayCount()==0
+	return Duel.IsBattlePhase() and not c:IsStatus(STATUS_CHAINING) and bc and bc:IsControler(1-tp) and c:GetOverlayCount()==0
+end
+
+--attach target
+function s.attachtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	if chk==0 then return bc and bc:IsOnField() and bc:IsCanBeEffectTarget(e) and not bc:IsImmuneToEffect(e) end
+	Duel.SetTargetCard(bc)
 end
 
 --attach operation
 function s.attachop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	if c:IsRelateToEffect(e) and c:IsFaceup() and bc and bc:IsRelateToBattle() then
-		if not bc:IsImmuneToEffect(e) then
-			Duel.Overlay(c,bc,true)
+	local tc=Duel.GetFirstTarget()
+	if c:IsRelateToEffect(e) and c:IsFaceup() and tc and tc:IsRelateToEffect(e) then
+		if not tc:IsImmuneToEffect(e) then
+			Duel.Overlay(c,tc,true)
 			--cannot attack until end of next turn
 			local e1=Effect.CreateEffect(c)
 			e1:SetDescription(3206)
