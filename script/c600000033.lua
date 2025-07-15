@@ -48,7 +48,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function s.extra_filter(c,e,tp)
-    return c:IsType(TYPE_SYNCHRO) or c:IsType(TYPE_XYZ) or c:IsType(TYPE_FUSION)
+    return c:IsType(TYPE_SYNCHRO) or c:IsType(TYPE_FUSION)
 end
 
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -71,7 +71,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
             e1:SetType(EFFECT_TYPE_SINGLE)
             e1:SetCode(EFFECT_CANNOT_ATTACK)
             e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-            e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+            --e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
             sc:RegisterEffect(e1)
         end
     else
