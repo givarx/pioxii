@@ -1,4 +1,5 @@
 -- Scripted for Project Ignis by GitHub Copilot
+-- bisceglia o malacarn
 local s,id=GetID()
 function s.initial_effect(c)
     -- Ritual Summon only with "Filtro Applicazione Ai"
