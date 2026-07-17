@@ -1,20 +1,19 @@
-local function alwaysTrue() return true end
 -- Scripted for Project Ignis by GitHub Copilot
 local s,id=GetID()
 function s.initial_effect(c)
     -- Ritual Summon only with "Filtro Applicazione Ai"
+    aux.AddCodeList(c,600000011)
     c:EnableReviveLimit()
-    Ritual.AddProcGreaterCode(c,600000011,0,0)
-    -- Main Phase effect: Banish 1 card from hand, shuffle all Spells/Traps on field into Deck
-    -- Main Phase effect: Banish 1 card from hand, shuffle all Spells/Traps on field into Deck
+
+    -- Main Phase effect: banish 1 card from your hand, then shuffle all Spell/Trap cards on the field into the Deck
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id,0))
     e2:SetCategory(CATEGORY_REMOVE+CATEGORY_TODECK)
     e2:SetType(EFFECT_TYPE_IGNITION)
     e2:SetRange(LOCATION_MZONE)
-    e2:SetCountLimit(1,id)
-    e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END) -- Mostra il tasto solo in Main Phase
-    e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+    e2:SetCountLimit(1)
+    e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
+    e2:SetCondition(function(e,tp)
         return Duel.IsMainPhase() and e:GetHandler():IsControler(tp)
     end)
     e2:SetCost(s.cost)
@@ -24,11 +23,14 @@ function s.initial_effect(c)
 end
 
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil) end
+    if chk==0 then
+        return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil)
+    end
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
     local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,nil)
-    if #g==0 then return false end
-    Duel.Remove(g,POS_FACEUP,REASON_COST)
+    if #g>0 then
+        Duel.Remove(g,POS_FACEUP,REASON_COST)
+    end
 end
 
 function s.spelltrapfilter(c)
