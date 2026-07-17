@@ -2,8 +2,8 @@
 local s,id=GetID()
 function s.initial_effect(c)
     --Xyz Summon
-    Xyz.AddProcedure(c,nil,4,2)
-    c:EnableReviveLimit()
+    aux.AddXyzProcedure(c,nil,4,2)
+	c:EnableReviveLimit()
     --Piercing
     local e1=Effect.CreateEffect(c)
     e1:SetType(EFFECT_TYPE_SINGLE)

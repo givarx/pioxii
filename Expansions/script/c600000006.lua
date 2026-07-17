@@ -2,6 +2,7 @@
 function c600000006.initial_effect(c)
     -- Può essere equipaggiata a qualsiasi mostro sul terreno
     -- Aggiungi l'archetipo 0x1111 al mostro equipaggiato
+	-- se il mostro non è falcone il mago ciolone  esso non puo attaccare
     local e1=Effect.CreateEffect(c)
     e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -10,6 +11,12 @@ function c600000006.initial_effect(c)
 	e1:SetTarget(c600000006.target)
 	e1:SetOperation(c600000006.operation)
 	c:RegisterEffect(e1)
+
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_EQUIP)
+	e2:SetCondition(c600000006.atkcond)
+	e2:SetCode(EFFECT_CANNOT_ATTACK)
+	c:RegisterEffect(e2)
 
     local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
@@ -31,4 +38,13 @@ function c600000006.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
+end
+function c600000006.atkcond(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=c:GetEquipTarget()
+	if not tc then return false end
+
+	local code=tc:GetCode()
+
+	return code ~= 600000007
 end

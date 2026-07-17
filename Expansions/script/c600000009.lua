@@ -1,15 +1,17 @@
 -- c600000009.lua
 -- Script per il mostro con effetto: puoi mandare questa carta dalla tua mano al Cimitero; bandisci 1 carta dalla mano del tuo avversario.
-
+-- è un effetto rapido, attivabile solo se l oppo ha 4 carte in piu di me
 local s,id=GetID()
 function s.initial_effect(c)
     -- Effetto rapido: manda questa carta dalla mano al Cimitero per bandire 1 carta dalla mano dell'avversario
     local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(id,0))
     e1:SetCategory(CATEGORY_REMOVE)
+    e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
     e1:SetType(EFFECT_TYPE_QUICK_O)
     e1:SetCode(EVENT_FREE_CHAIN)
     e1:SetRange(LOCATION_HAND)
+    e1:SetCondition(s.condition)
     e1:SetCost(s.cost)
     e1:SetTarget(s.target)
     e1:SetOperation(s.operation)
@@ -36,4 +38,9 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
     local sg=g:Select(tp,1,1,nil)
     Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
     Duel.ShuffleHand(1-tp)
+end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+    local oppHand=Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)
+    local myHand=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
+    return oppHand-myHand>3
 end
