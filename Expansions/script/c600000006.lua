@@ -1,7 +1,6 @@
 -- Occhiali di falcone
 function c600000006.initial_effect(c)
     -- Può essere equipaggiata a qualsiasi mostro sul terreno
-    -- Aggiungi l'archetipo 0x1111 al mostro equipaggiato
 	-- se il mostro non è falcone il mago ciolone  esso non puo attaccare
     local e1=Effect.CreateEffect(c)
     e1:SetCategory(CATEGORY_EQUIP)
