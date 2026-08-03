@@ -1,4 +1,6 @@
 -- burger king (Magia Terreno)
+-- ti fa scegliere o scartare dalla amno per cercare da deck
+-- bandisci da mano per ripescare da cimitero
 local s,id = GetID()
 function s.initial_effect(c)
     -- Attiva normalmente (Field Spell)
@@ -89,9 +91,9 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
             end
         end
     else
-        -- Banish 1 carta dal Cimitero come costo, poi aggiungi 1 carta dal Cimitero alla mano
+        -- Banish 1 carta dalla mano come costo, poi aggiungi 1 carta dal Cimitero alla mano
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-        local rg = Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_GRAVE,0,1,1,nil)
+        local rg = Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_HAND,0,1,1,nil)
         if #rg>0 and Duel.Remove(rg,POS_FACEUP,REASON_COST)>0 then
             Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
             local hg = Duel.SelectMatchingCard(tp,s.filter4,tp,LOCATION_GRAVE,0,1,1,nil)

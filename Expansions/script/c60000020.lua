@@ -13,10 +13,48 @@ function s.initial_effect(c)
     e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
     e2:SetType(EFFECT_TYPE_IGNITION)
     e2:SetRange(LOCATION_SZONE)
+    e2:SetCost(s.cost)
     e2:SetCountLimit(1,id)
     e2:SetTarget(s.tdtg)
     e2:SetOperation(s.tdop)
     c:RegisterEffect(e2)
+end
+function s.costfilter(c)
+    return c:IsSetCard(0x1111)
+        and c:IsType(TYPE_MONSTER)
+        and c:IsDiscardable()
+end
+
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+    if chk==0 then
+        return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>=3
+            and Duel.IsExistingMatchingCard(
+                s.costfilter,
+                tp,
+                LOCATION_HAND,
+                0,
+                1,
+                nil
+            )
+    end
+
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+
+    local g=Duel.SelectMatchingCard(
+        tp,
+        s.costfilter,
+        tp,
+        LOCATION_HAND,
+        0,
+        1,
+        1,
+        nil
+    )
+
+    Duel.SendtoGrave(
+        g,
+        REASON_COST|REASON_DISCARD
+    )
 end
 
 function s.tdfilter(c)
@@ -36,7 +74,7 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
     local g = Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_HAND,0,nil)
     if #g==0 then return end
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-    local sg = g:Select(tp,1,2,nil)
+    local sg = g:Select(tp,2,2,nil)
     if #sg > 0 then
         Duel.SendtoDeck(sg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
         Duel.ShuffleDeck(tp)

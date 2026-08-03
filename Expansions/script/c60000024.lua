@@ -3,7 +3,7 @@ local SIN = 0x9999 -- contatore sinistro stradale
 local s, id=GetID()
 function s.initial_effect(c)
     -- synchro summon: tuner + 1 or more non-tuner(s) (level 6)
-    Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)
+    aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
     c:EnableReviveLimit()
     --counter settings
     c:EnableCounterPermit(SIN)
