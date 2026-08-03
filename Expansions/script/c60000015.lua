@@ -25,7 +25,7 @@ function c600000015.initial_effect(c)
     e2:SetRange(LOCATION_SZONE)
     e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
     e2:SetCondition(c600000015.tgcon)
-    e2:SetValue(aux.tgoval)
+    e2:SetValue(1)
     c:RegisterEffect(e2)
     
 end
@@ -49,21 +49,13 @@ end
 
 function c600000015.tgcon(e)
     local tp = e:GetHandlerPlayer()
-    return Duel.IsExistingMatchingCard(function(c) return c:IsFaceup() and c:IsCode(600000008) end, tp, LOCATION_MZONE, 0, 1, nil)
-end
-function c600000015.replacecon(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    if not c:IsAbleToRemove() then return false end
-    local g=eg:Filter(function(tc)
-        return tc:IsFaceup() and tc:IsCode(600000008) and tc:IsControler(tp) 
-           and tc:IsOnField() and tc:IsReason(REASON_EFFECT)
-    end, nil)
-end
-
-function c600000015.replaceop(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    if c:IsRelateToEffect(e) and c:IsAbleToRemove() and Duel.SelectYesNo(tp,aux.Stringid(600000015,1)) then
-        Duel.Remove(c, POS_FACEUP, REASON_EFFECT)
-        Duel.NegateEffect(ev)
-    end
+    return Duel.IsExistingMatchingCard(
+        Card.IsCode,
+        e:GetHandlerPlayer(),
+        LOCATION_MZONE,
+        LOCATION_MZONE,
+        1,
+        nil,
+        600000008
+    )
 end
