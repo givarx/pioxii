@@ -33,7 +33,7 @@ end
 function s.eqcon(e)
     local c=e:GetHandler()
     local eq=c:GetEquipGroup()
-    return eq and eq:IsExists(function(ec) return ec:IsCode(600000006) end,1,nil)
+    return eq and eq:IsExists(function(ec) return ec:IsCode(60000006) end,1,nil)
 end
 function s.atkval(e,c)
     return c:GetBaseAttack()

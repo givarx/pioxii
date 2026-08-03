@@ -19,18 +19,6 @@ function s.initial_effect(c)
     e1:SetOperation(s.operation)
     c:RegisterEffect(e1)
     
-    -- Guadagna LP alla fine di ogni tuo turno in base alle carte "12E0" nel Cimitero e tra quelle bandite
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-    e2:SetCode(EVENT_PHASE+PHASE_END)
-    e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
-        return Duel.GetTurnPlayer()==tp
-    end)
-    e2:SetRange(LOCATION_FZONE)
-    e2:SetCountLimit(1,id+1000)
-    e2:SetOperation(s.lpop)
-    c:RegisterEffect(e2)
-    
     -- I mostri dell'archetipo Michele (0x5555) guadagnano 400 ATK
     local e3=Effect.CreateEffect(c)
     e3:SetType(EFFECT_TYPE_FIELD)
@@ -54,7 +42,7 @@ function s.filter2(c)
     return c:IsAbleToGraveAsCost()
 end
 
--- Effetto 2: Banish 1 carta dal Cimitero come costo per aggiungere 1 carta dal Cimitero alla mano
+-- Effetto 2: Banish 1 carta dalla mano come costo per aggiungere 1 carta dal Cimitero alla mano
 function s.filter3(c)
     return c:IsAbleToRemoveAsCost()
 end
@@ -65,7 +53,7 @@ end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
     local option1 = Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_HAND,0,1,nil)
         and Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_DECK,0,1,nil)
-    local option2 = Duel.IsExistingMatchingCard(s.filter3,tp,LOCATION_GRAVE,0,1,nil)
+    local option2 = Duel.IsExistingMatchingCard(s.filter3,tp,LOCATION_HAND,0,1,nil)
         and Duel.IsExistingMatchingCard(s.filter4,tp,LOCATION_GRAVE,0,1,nil)
     if chk==0 then return option1 or option2 end
     local op=0
@@ -80,7 +68,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
     if op==0 then
         Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
     else
-        Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_GRAVE)
+        Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_HAND)
         Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
     end
 end
