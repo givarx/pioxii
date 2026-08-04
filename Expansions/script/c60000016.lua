@@ -13,9 +13,9 @@ function s.initial_effect(c)
     c:RegisterEffect(e1)
 end
 
--- Mostro "Mafioso" scoperto
+-- Mostro "Mafioso" o chad scoperto
 function s.cfilter(c)
-    return c:IsFaceup() and c:IsSetCard(0x2222)
+    return c:IsFaceup() and (c:IsSetCard(0x2222) or c:IsSetCard(0x3333))
 end
 
 function s.condition(e,tp,eg,ep,ev,re,r,rp)

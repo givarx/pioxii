@@ -3,8 +3,8 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--xyz summon
-	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x1111),12,2) -- 0x1111 rappresenta "TSO Obbligatorio"
-	c:EnableReviveLimit()
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x1111),12,2)
+c:EnableReviveLimit()
 	
 	--cannot be target for "TSO Obbligatorio" monsters
 	local e1=Effect.CreateEffect(c)

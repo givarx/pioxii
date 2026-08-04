@@ -19,7 +19,7 @@ function s.initial_effect(c)
     e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
     e2:SetType(EFFECT_TYPE_IGNITION)
     e2:SetRange(LOCATION_GRAVE)
-    e2:SetCountLimit(1,id+100)
+    e2:SetCountLimit(1,id+1000)
     e2:SetCondition(s.spcon)
     e2:SetTarget(s.sptg)
     e2:SetOperation(s.spop)
@@ -54,7 +54,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
     return Duel.IsExistingMatchingCard(s.ciolonefilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.ciolonefilter(c)
-    return c:IsCode(600000007) -- Sostituisci con l'ID di "Falcone il Mago Ciolone"
+    return c:IsSetCard(0x1112)-- se la carta è un mostro falcone
 end
 -- Effetto 2: Target (evoca questa carta)
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
