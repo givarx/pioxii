@@ -4,8 +4,26 @@ local s,id=GetID()
 function s.initial_effect(c)
     -- Fusion Summon procedure
     c:EnableReviveLimit()
-    Fusion.AddProcMix(c,true,true,600000001, 600000021,600000022)
-	Fusion.AddContactProc(c,s.contactfil,s.contactop,true)
+
+    -- Materiali Fusione normali
+    aux.AddFusionProcMix(
+        c,
+        true,
+        true,
+        60000001,
+        60000021,
+        60000022
+    )
+
+    -- Fusione Contatto usando mostri sul tuo Terreno
+    aux.AddContactFusionProcedure(
+        c,
+        s.contactfilter,
+        LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,
+        0,
+        aux.ContactFusionSendToDeck(c)
+    )
+
     -- Effect: quando questa carta viene Evocata Specialmente, ritorna alla mano tutti i mostri dell'avversario
     local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(id,0))
@@ -17,7 +35,6 @@ function s.initial_effect(c)
     e1:SetOperation(s.thop)
     c:RegisterEffect(e1)
 
-    
 end
 function s.contactfil(tp)
 	return Duel.GetMatchingGroup(Card.IsAbleToRemoveAsCost,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,nil)
