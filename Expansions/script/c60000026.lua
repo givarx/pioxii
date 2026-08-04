@@ -30,12 +30,12 @@ function c60000026.operation(e,tp,eg,ep,ev,re,r,rp)
     -- Calcola il danno che avresti subito
     local token_atk=math.floor(dam/3)
     -- Verifica la possibilità di evocare token personalizzati
-    if not Duel.IsPlayerCanSpecialSummonMonster(tp,600000010,6,0x1111,token_atk,0,1,RACE_WARRIOR,ATTRIBUTE_EARTH) then return end
+    if not Duel.IsPlayerCanSpecialSummonMonster(tp,60000010,6,0x1111,token_atk,0,1,RACE_WARRIOR,ATTRIBUTE_EARTH) then return end
     -- Evoca fino a 3 token "Grezzotto Di Candelaro" in posizione di attacco
     local ft = math.min(3, Duel.GetLocationCount(tp,LOCATION_MZONE))
     if ft==0 then return end
     for i=1,ft do
-        local token=Duel.CreateToken(tp,600000010)
+        local token=Duel.CreateToken(tp,60000010)
         if Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
             local e1=Effect.CreateEffect(e:GetHandler())
             e1:SetType(EFFECT_TYPE_SINGLE)
