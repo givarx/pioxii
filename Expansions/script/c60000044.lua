@@ -109,7 +109,8 @@ end
 ------------------------------------------------------------
 
 function s.distarget(e,c)
-	return c~=e:GetHandler()
+	return c:IsType(TYPE_MONSTER)
+		and not c:IsSetCard(SET_FALCONE)
 end
 
 ------------------------------------------------------------
