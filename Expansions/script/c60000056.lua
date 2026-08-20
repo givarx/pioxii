@@ -282,8 +282,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	--------------------------------------------------------
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 
-	if ft>2 then
-		ft=2
+	if ft>1 then
+		ft=1
 	end
 
 	Duel.Hint(
