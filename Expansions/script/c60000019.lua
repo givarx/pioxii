@@ -1,9 +1,10 @@
 --Chemio Counter Monster
 local s,id=GetID()
+local COUNTER_CUSTOM=0x4321
 function s.initial_effect(c)
 	--enable counter
-	c:EnableCounterPermit(0x4321)
-	c:SetCounterLimit(0x4321, 150)
+	c:EnableCounterPermit(COUNTER_CUSTOM)
+	c:SetCounterLimit(COUNTER_CUSTOM, 150)
 	--add counter during standby phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
@@ -13,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetCondition(s.ctcon)
 	e1:SetOperation(s.ctop)
 	c:RegisterEffect(e1)
-	--damage when monster leaves field (removed - using individual effects instead)
+	--Damage to the owner of each monster destroyed on the field
 	local e3=Effect.CreateEffect(c)
     e3:SetDescription(aux.Stringid(id,0))
     e3:SetCategory(CATEGORY_DAMAGE)
@@ -34,8 +35,8 @@ end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() then
-		c:AddCounter(0x4321,1)
-		--Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(0x4321))
+		c:AddCounter(COUNTER_CUSTOM,1)
+		--Debug.Message("Counter aggiunto automaticamente! Totale: " .. c:GetCounter(COUNTER_CUSTOM))
 	end
 end
 
