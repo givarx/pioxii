@@ -1,4 +1,5 @@
---Buongiorno Carabinieri
+-- Buongiorno Carabinieri
+-- Magia Normale
 local s,id=GetID()
 
 local SET_FALCONE=0x1112
@@ -39,87 +40,80 @@ function s.initial_effect(c)
 end
 
 ------------------------------------------------------------
--- Magie/Trappole sul Terreno
-------------------------------------------------------------
-function s.targetfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP)
-end
-
-------------------------------------------------------------
--- Solo il giocatore che ha attivato questa carta
--- può aggiungere effetti alla Catena
+-- Solo tu puoi aggiungere effetti alla Catena
 ------------------------------------------------------------
 function s.chainlimit(e,rp,tp)
 	return tp==rp
 end
 
 ------------------------------------------------------------
--- Selezione del bersaglio
+-- Bersaglio: 1 carta sul Terreno, eccetto questa carta
 ------------------------------------------------------------
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then
 		return chkc:IsOnField()
 			and chkc~=e:GetHandler()
-			and s.targetfilter(chkc)
 	end
 
 	if chk==0 then
 		return Duel.IsExistingTarget(
-			s.targetfilter,
-			tp,
-			LOCATION_ONFIELD,
-			LOCATION_ONFIELD,
-			1,
-			e:GetHandler()
+			aux.TRUE,
+			tp,LOCATION_ONFIELD,LOCATION_ONFIELD,
+			1,e:GetHandler()
 		)
 	end
 
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(
-		tp,
-		s.targetfilter,
-		tp,
-		LOCATION_ONFIELD,
-		LOCATION_ONFIELD,
-		1,1,
-		e:GetHandler()
+		tp,aux.TRUE,
+		tp,LOCATION_ONFIELD,LOCATION_ONFIELD,
+		1,1,e:GetHandler()
 	)
 
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-
-	-- L'avversario non può rispondere,
-	-- nemmeno dopo un ulteriore effetto concatenato da te.
 	Duel.SetChainLimitTillChainEnd(s.chainlimit)
 end
 
 ------------------------------------------------------------
--- Carta che l'avversario può scartare
+-- Carta scartabile dello stesso tipo: Mostro/Magia/Trappola
 ------------------------------------------------------------
-function s.discardfilter(c)
+function s.discardfilter(c,cardtype)
 	return c:IsDiscardable()
+		and bit.band(c:GetType(),cardtype)~=0
 end
 
 ------------------------------------------------------------
 -- Risoluzione
 ------------------------------------------------------------
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if not tc
+		or not tc:IsRelateToEffect(e)
+		or not tc:IsOnField() then
+		return
+	end
+
+	-- Considera il tipo del bersaglio alla risoluzione.
+	local cardtype=bit.band(
+		tc:GetType(),
+		TYPE_MONSTER+TYPE_SPELL+TYPE_TRAP
+	)
 	local opponent=1-tp
 
-	-- L'avversario può scartare 1 carta
-	-- per impedire l'applicazione dell'effetto.
+	-- L'avversario può scartare una carta dello stesso tipo.
 	if Duel.IsExistingMatchingCard(
 		s.discardfilter,
-		opponent,
-		LOCATION_HAND,
-		0,
-		1,nil
+		opponent,LOCATION_HAND,0,
+		1,nil,cardtype
 	) and Duel.SelectYesNo(opponent,aux.Stringid(id,1)) then
 
 		local ct=Duel.DiscardHand(
 			opponent,
 			s.discardfilter,
 			1,1,
-			REASON_COST+REASON_DISCARD
+			REASON_COST+REASON_DISCARD,
+			nil,
+			cardtype
 		)
 
 		if ct>0 then
@@ -127,9 +121,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 
-	-- Se non scarta, distrugge la carta bersaglio.
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	-- Se non scarta, distrugge il bersaglio.
+	if tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

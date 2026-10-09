@@ -1,4 +1,5 @@
 --Lorenzo a Mangiasj
+-- Mostro "Lorenzo"
 local s,id=GetID()
 local SET_LORENZO=0x1113
 
@@ -6,7 +7,7 @@ s.listed_series={SET_LORENZO}
 
 function s.initial_effect(c)
 	------------------------------------------------------------
-	-- Puoi convertire il recupero LP in danno all'avversario
+	-- Conversione facoltativa del recupero LP in danno
 	------------------------------------------------------------
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -18,11 +19,11 @@ function s.initial_effect(c)
 
 	------------------------------------------------------------
 	-- Evocata dall'effetto di un mostro "Lorenzo":
-	-- recupera 1000 LP
+	-- guadagna 1000 LP e bandisci un mostro dal Cimitero avversario
 	------------------------------------------------------------
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_RECOVER)
+	e2:SetCategory(CATEGORY_RECOVER+CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCondition(s.reccon)
@@ -32,7 +33,7 @@ function s.initial_effect(c)
 end
 
 ------------------------------------------------------------
--- Riconosce un effetto che prevede recupero LP per te
+-- Effetto che prevede un recupero LP per te
 ------------------------------------------------------------
 function s.replacecon(e,tp,eg,ep,ev,re,r,rp)
 	local exists,g,count,player,amount=
@@ -44,7 +45,7 @@ function s.replacecon(e,tp,eg,ep,ev,re,r,rp)
 end
 
 ------------------------------------------------------------
--- Scelta facoltativa prima della risoluzione
+-- Scegli se convertire il recupero
 ------------------------------------------------------------
 function s.replaceop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
@@ -54,7 +55,7 @@ function s.replaceop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_CARD,0,id)
 
-	-- Converte in danno il recupero provocato da questo effetto.
+	-- Trasforma in danno il recupero di questo effetto.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_REVERSE_RECOVER)
@@ -65,8 +66,7 @@ function s.replaceop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_CHAIN)
 	Duel.RegisterEffect(e1,tp)
 
-	-- Trasferisce all'avversario soltanto il danno
-	-- derivato dal recupero di questo stesso effetto.
+	-- Trasferisce quel danno all'avversario.
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_REFLECT_DAMAGE)
@@ -77,8 +77,8 @@ function s.replaceop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetReset(RESET_CHAIN)
 	Duel.RegisterEffect(e2,tp)
 
-	-- Rimuove entrambi gli effetti appena questo anello
-	-- della Catena ha terminato di risolversi.
+	-- Rimuove la conversione dopo la risoluzione
+	-- di questo specifico anello della Catena.
 	local cleanup=Effect.CreateEffect(c)
 	cleanup:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	cleanup:SetCode(EVENT_CHAIN_SOLVED)
@@ -104,7 +104,7 @@ function s.reflectval(e,re,damage,r,rp,rc)
 end
 
 ------------------------------------------------------------
--- Controlla l'effetto che ha effettuato l'Evocazione
+-- Evocazione Speciale tramite un mostro "Lorenzo"
 ------------------------------------------------------------
 function s.reccon(e,tp,eg,ep,ev,re,r,rp)
 	local se=e:GetHandler():GetReasonEffect()
@@ -117,18 +117,52 @@ function s.reccon(e,tp,eg,ep,ev,re,r,rp)
 end
 
 ------------------------------------------------------------
--- Recupero di 1000 LP
+-- Mostro bandibile dal Cimitero
+------------------------------------------------------------
+function s.rmfilter(c)
+	return c:IsType(TYPE_MONSTER)
+		and c:IsAbleToRemove()
+end
+
+------------------------------------------------------------
+-- Informazioni sull'effetto: non sceglie bersagli
 ------------------------------------------------------------
 function s.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1000)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
+
+	Duel.SetOperationInfo(
+		0,CATEGORY_RECOVER,nil,0,tp,1000
+	)
+
+	local g=Duel.GetMatchingGroup(
+		aux.NecroValleyFilter(s.rmfilter),
+		tp,0,LOCATION_GRAVE,nil
+	)
+	if g:GetCount()>0 then
+		Duel.SetOperationInfo(
+			0,CATEGORY_REMOVE,g,1,1-tp,LOCATION_GRAVE
+		)
+	end
 end
 
+------------------------------------------------------------
+-- Recupero LP e bando
+------------------------------------------------------------
 function s.recop(e,tp,eg,ep,ev,re,r,rp)
-	local p,amount=Duel.GetChainInfo(
-		0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM
+	-- Può essere convertito in 1000 danni dal primo effetto.
+	Duel.Recover(tp,1000,REASON_EFFECT)
+
+	-- Il bando viene applicato anche se il recupero
+	-- è stato convertito in danno.
+	Duel.BreakEffect()
+
+	local g=Duel.GetMatchingGroup(
+		aux.NecroValleyFilter(s.rmfilter),
+		tp,0,LOCATION_GRAVE,nil
 	)
-	Duel.Recover(p,amount,REASON_EFFECT)
+	if g:GetCount()==0 then return end
+
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local sg=g:Select(tp,1,1,nil)
+	Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
 end
