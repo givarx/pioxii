@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 
 	------------------------------------------------------------
-	-- Materiali: 2 mostri "Lorenzo"
+	-- Materiali Fusione: 2 mostri "Lorenzo"
 	------------------------------------------------------------
 	aux.AddFusionProcFunRep(c,s.fusfilter,2,true)
 
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 
 	------------------------------------------------------------
-	-- Contact Fusion
+	-- Contact Fusion: bandisce 2 mostri "Lorenzo"
 	------------------------------------------------------------
 	local ep=Effect.CreateEffect(c)
 	ep:SetType(EFFECT_TYPE_FIELD)
@@ -37,7 +37,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(ep)
 
 	------------------------------------------------------------
-	-- Evocazione Fusione: distruggi fino a 2 carte
+	-- Quando viene Evocato tramite Fusione:
+	-- distruggi fino a 2 carte sul Terreno
 	------------------------------------------------------------
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -52,8 +53,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 
 	------------------------------------------------------------
-	-- Main Phase 2: torna nell'Extra Deck
-	-- ed Evoca fino a 2 "Lorenzo" dal Deck
+	-- Main Phase 2:
+	-- rimetti questa carta nell'Extra Deck;
+	-- Evoca fino a 2 mostri "Lorenzo" dal Deck
+	-- con ATK originale totale <= 2800
 	------------------------------------------------------------
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
@@ -69,7 +72,7 @@ function s.initial_effect(c)
 end
 
 ------------------------------------------------------------
--- Materiali Fusione
+-- MATERIALI FUSIONE
 ------------------------------------------------------------
 
 function s.fusfilter(c)
@@ -77,24 +80,30 @@ function s.fusfilter(c)
 		and c:IsType(TYPE_MONSTER)
 end
 
+------------------------------------------------------------
+-- Limitazione Evocazione Speciale
+------------------------------------------------------------
+
 function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
 
 ------------------------------------------------------------
 -- CONTACT FUSION
--- I materiali devono poter andare al Cimitero
+-- Materiali: 2 mostri "Lorenzo" sul tuo Terreno
+-- Devono poter essere banditi come costo
 ------------------------------------------------------------
 
 function s.contactfilter(c,fc)
 	return s.fusfilter(c)
 		and not c:IsType(TYPE_TOKEN)
-		and c:IsAbleToGraveAsCost()
+		and c:IsAbleToRemoveAsCost()
 		and c:IsCanBeFusionMaterial(fc,SUMMON_TYPE_FUSION)
 end
 
 ------------------------------------------------------------
--- Verifica spazio disponibile dopo l'uso dei materiali
+-- Controlla che dopo aver bandito i materiali
+-- sia disponibile una Zona Mostri
 ------------------------------------------------------------
 
 function s.matcheck(g,tp,c)
@@ -102,11 +111,13 @@ function s.matcheck(g,tp,c)
 end
 
 ------------------------------------------------------------
--- Condizione Contact Fusion
+-- Condizione della Contact Fusion
 ------------------------------------------------------------
 
 function s.contactcon(e,c)
-	if c==nil then return true end
+	if c==nil then
+		return true
+	end
 
 	local tp=c:GetControler()
 
@@ -129,7 +140,7 @@ function s.contactcon(e,c)
 end
 
 ------------------------------------------------------------
--- Selezione dei 2 materiali
+-- Seleziona esattamente 2 materiali "Lorenzo"
 ------------------------------------------------------------
 
 function s.contacttg(e,tp,eg,ep,ev,re,r,rp,chk,c)
@@ -156,7 +167,9 @@ function s.contacttg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 		fc
 	)
 
-	if not sg then return false end
+	if not sg then
+		return false
+	end
 
 	sg:KeepAlive()
 	e:SetLabelObject(sg)
@@ -165,22 +178,25 @@ function s.contacttg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 end
 
 ------------------------------------------------------------
--- CONTACT FUSION:
--- manda i materiali al Cimitero
+-- CONTACT FUSION
+-- Registra e bandisce scoperti i materiali
 ------------------------------------------------------------
 
 function s.contactop(e,tp,eg,ep,ev,re,r,rp,c)
 	local fc=e:GetHandler()
 	local g=e:GetLabelObject()
 
-	if not g then return end
+	if not g then
+		return
+	end
 
-	-- Registra i materiali della Fusione
+	-- Registra i materiali Fusione
 	fc:SetMaterial(g)
 
-	-- Manda i materiali al Cimitero
-	Duel.SendtoGrave(
+	-- Bandisce i materiali scelti
+	Duel.Remove(
 		g,
+		POS_FACEUP,
 		REASON_COST+REASON_MATERIAL+REASON_FUSION
 	)
 
@@ -190,17 +206,25 @@ end
 
 ------------------------------------------------------------
 -- EFFETTO 1
--- Se Evocato tramite Fusione: distruggi fino a 2 carte
+-- Quando viene Evocato tramite Fusione
 ------------------------------------------------------------
 
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end
 
+------------------------------------------------------------
+-- Verifica che sia presente almeno una carta distruggibile
+------------------------------------------------------------
+
+function s.desfilter(c)
+	return c:IsDestructable()
+end
+
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.IsExistingMatchingCard(
-			aux.TRUE,
+			s.desfilter,
 			tp,
 			LOCATION_ONFIELD,
 			LOCATION_ONFIELD,
@@ -209,19 +233,32 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 		)
 	end
 
+	local g=Duel.GetMatchingGroup(
+		s.desfilter,
+		tp,
+		LOCATION_ONFIELD,
+		LOCATION_ONFIELD,
+		nil
+	)
+
 	Duel.SetOperationInfo(
 		0,
 		CATEGORY_DESTROY,
-		nil,
-		1,
-		PLAYER_ALL,
-		LOCATION_ONFIELD
+		g,
+		math.min(2,g:GetCount()),
+		0,
+		0
 	)
 end
 
+------------------------------------------------------------
+-- Distruggi fino a 2 carte sul Terreno
+-- senza scegliere bersagli
+------------------------------------------------------------
+
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(
-		aux.TRUE,
+		s.desfilter,
 		tp,
 		LOCATION_ONFIELD,
 		LOCATION_ONFIELD,
@@ -229,18 +266,27 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	)
 
 	local maxct=math.min(2,g:GetCount())
-	if maxct==0 then return end
+
+	if maxct==0 then
+		return
+	end
 
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 
-	local sg=g:Select(tp,1,maxct,nil)
+	local sg=g:Select(
+		tp,
+		1,
+		maxct,
+		nil
+	)
 
 	Duel.Destroy(sg,REASON_EFFECT)
 end
 
 ------------------------------------------------------------
 -- EFFETTO 2
--- Attivabile nella Main Phase 2 del proprio turno
+-- Attivabile solamente nella Main Phase 2
+-- del proprio turno
 ------------------------------------------------------------
 
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -270,6 +316,7 @@ end
 
 ------------------------------------------------------------
 -- Mostri "Lorenzo" evocabili dal Deck
+-- ATK originale entro il limite indicato
 ------------------------------------------------------------
 
 function s.spfilter(c,e,tp,limit)
@@ -280,9 +327,17 @@ function s.spfilter(c,e,tp,limit)
 		and atk>=0
 		and atk<=limit
 		and c:IsCanBeSpecialSummoned(
-			e,0,tp,false,false
+			e,
+			0,
+			tp,
+			false,
+			false
 		)
 end
+
+------------------------------------------------------------
+-- Target dell'Evocazione Speciale
+------------------------------------------------------------
 
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -312,13 +367,15 @@ end
 
 ------------------------------------------------------------
 -- Evoca fino a 2 mostri "Lorenzo"
--- ATK originale totale <= 2800
+-- con ATK originale totale <= 2800
 ------------------------------------------------------------
 
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 
-	if ft<=0 then return end
+	if ft<=0 then
+		return
+	end
 
 	local g=Duel.GetMatchingGroup(
 		s.spfilter,
@@ -331,20 +388,33 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		2800
 	)
 
-	if g:GetCount()==0 then return end
+	if g:GetCount()==0 then
+		return
+	end
 
-	-- Limitazione di Drago Spirito Occhi Blu
+	--------------------------------------------------------
+	-- Restrizione di Drago Spirito Occhi Blu
+	--------------------------------------------------------
 	if Duel.IsPlayerAffectedByEffect(tp,59822133) then
 		ft=1
 	end
 
-	-- Primo mostro
+	--------------------------------------------------------
+	-- Seleziona il primo mostro
+	--------------------------------------------------------
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 
 	local sg=g:Select(tp,1,1,nil)
 	local tc=sg:GetFirst()
 
-	-- Eventuale secondo mostro
+	if not tc then
+		return
+	end
+
+	--------------------------------------------------------
+	-- Seleziona eventualmente un secondo mostro
+	-- rispettando il totale di 2800 ATK
+	--------------------------------------------------------
 	if ft>=2 then
 		local remaining=2800-tc:GetTextAttack()
 
@@ -367,6 +437,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 
+	--------------------------------------------------------
+	-- Evocazione Speciale
+	--------------------------------------------------------
 	Duel.SpecialSummon(
 		sg,
 		0,

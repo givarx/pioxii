@@ -1,56 +1,127 @@
 -- c600000030.lua
--- Fusion monster that requires materials: 600000001, 600000021, and 600000022
 local s,id=GetID()
+
 function s.initial_effect(c)
-    -- Fusion Summon procedure
-    c:EnableReviveLimit()
+	c:EnableReviveLimit()
 
-    -- Materiali Fusione normali
-    aux.AddFusionProcMix(
-        c,
-        true,
-        true,
-        60000001,
-        60000021,
-        60000022
-    )
+	--------------------------------------------------
+	-- Materiali Fusione:
+	-- 60000001 + 60000021 + 60000022
+	--------------------------------------------------
+	aux.AddFusionProcMix(
+		c,
+		true,
+		true,
+		60000001,
+		60000021,
+		60000022
+	)
 
-    -- Fusione Contatto usando mostri sul tuo Terreno
-    aux.AddContactFusionProcedure(
-        c,
-        s.contactfilter,
-        LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,
-        0,
-        aux.ContactFusionSendToDeck(c)
-    )
+	--------------------------------------------------
+	-- Contact Fusion
+	-- Bandisci i materiali da Mano, Terreno o Cimitero
+	--------------------------------------------------
+	aux.AddContactFusionProcedure(
+		c,
+		s.contactfilter,
+		LOCATION_HAND+LOCATION_MZONE+LOCATION_GRAVE,
+		0,
+		s.contactop
+	)
 
-    -- Effect: quando questa carta viene Evocata Specialmente, ritorna alla mano tutti i mostri dell'avversario
-    local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,0))
-    e1:SetCategory(CATEGORY_TOHAND)
-    e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
-    e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-    e1:SetProperty(EFFECT_FLAG_DELAY)
-    e1:SetTarget(s.target)
-    e1:SetOperation(s.thop)
-    c:RegisterEffect(e1)
-
+	--------------------------------------------------
+	-- Quando viene Evocata Specialmente:
+	-- fai tornare tutti i mostri dell'avversario in mano
+	--------------------------------------------------
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.thop)
+	c:RegisterEffect(e1)
 end
-function s.contactfil(tp)
-	return Duel.GetMatchingGroup(Card.IsAbleToRemoveAsCost,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND,0,nil)
+
+--------------------------------------------------
+-- Materiali validi per la Contact Fusion
+--------------------------------------------------
+
+function s.contactfilter(c)
+	return c:IsType(TYPE_MONSTER)
+		and (
+			c:IsFusionCode(60000001)
+			or c:IsFusionCode(60000021)
+			or c:IsFusionCode(60000022)
+		)
+		and c:IsAbleToRemoveAsCost()
 end
-function s.contactop(g)
-	Duel.Remove(g,POS_FACEUP,REASON_COST+REASON_MATERIAL)
+
+--------------------------------------------------
+-- Bandisci i materiali come costo della Contact Fusion
+--------------------------------------------------
+
+function s.contactop(g,tp)
+	Duel.Remove(
+		g,
+		POS_FACEUP,
+		REASON_COST+REASON_MATERIAL+REASON_FUSION
+	)
 end
+
+--------------------------------------------------
+-- Bersaglio dell'effetto di rimbalzo
+--------------------------------------------------
+
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-        if chk==0 then return Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_MZONE,1,nil) end
-	local sg=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,sg,#sg,0,0)
-    end
+	if chk==0 then
+		return Duel.IsExistingMatchingCard(
+			Card.IsAbleToHand,
+			tp,
+			0,
+			LOCATION_MZONE,
+			1,
+			nil
+		)
+	end
 
-    function s.thop(e,tp,eg,ep,ev,re,r,rp)
-        local g=Duel.GetMatchingGroup(Card.IsAbleToHand,tp,0,LOCATION_MZONE,nil)
-        if #g>0 then
-            Duel.SendtoHand(g,nil,REASON_EFFECT)
-        end
-    end
+	local g=Duel.GetMatchingGroup(
+		Card.IsAbleToHand,
+		tp,
+		0,
+		LOCATION_MZONE,
+		nil
+	)
+
+	Duel.SetOperationInfo(
+		0,
+		CATEGORY_TOHAND,
+		g,
+		g:GetCount(),
+		0,
+		0
+	)
+end
+
+--------------------------------------------------
+-- Rimanda tutti i mostri dell'avversario in mano
+--------------------------------------------------
+
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(
+		Card.IsAbleToHand,
+		tp,
+		0,
+		LOCATION_MZONE,
+		nil
+	)
+
+	if g:GetCount()>0 then
+		Duel.SendtoHand(
+			g,
+			nil,
+			REASON_EFFECT
+		)
+	end
+end
